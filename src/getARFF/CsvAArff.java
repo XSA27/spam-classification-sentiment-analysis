@@ -1,9 +1,11 @@
-package conversor;
+package getARFF;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.InputStreamReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,8 @@ import weka.core.DenseInstance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class TextDirectoryToArff {
+public class CsvAArff {
+
 	public void createDataset(String[] pathDirectorio) throws Exception {
 
 		// ArrayList se utiliza para preparar los atributos
@@ -26,50 +29,51 @@ public class TextDirectoryToArff {
 
 		File dir = new File(pathDirectorio[0]);
 
-		String directoryPathExt;
-		String clase;
-		String[] filesExt;
-		boolean missing = false;
+		BufferedReader br = null;
+		String line = "";
+		String cvsSplitBy = ",";
+		String clase = "?";
+		try {
 
-		// Se listan las carpetas
-		String[] files = dir.list();
-
-		for (int q = 0; q < files.length; q++) {
-			System.out.println();
-			clase = files[q];
-			if (!files[q].endsWith(".txt")) {
-				File dir1 = new File(pathDirectorio[0] + "\\" + files[q]);
-				directoryPathExt = pathDirectorio[0] + "\\" + files[q];
-				filesExt = dir1.list();
-			} else {
-
-				directoryPathExt = pathDirectorio[0];
-				filesExt = dir.list();
-				missing = true;
-			}
-			for (int i = 0; i < filesExt.length; i++) {
-				try {
+			br = new BufferedReader(new FileReader(dir));
+			line = br.readLine();// necesito saltar la primera linea
+			while ((line = br.readLine()) != null) {
+				String texto = "";
+				if (line.contains("Oct")) {
 					double[] newInst = new double[2];
-					if (missing) {
+					String[] frase = line.split(cvsSplitBy);
+					clase = frase[1];
+					for (int z = 0; z < frase.length; z++) {
+						if (z == 1) {
+							z++;
+						} else {
+							texto = texto.concat(frase[z]);
+						}
+					}
+					clase = clase.replaceAll("\"", "");
+					if (clase.equals("UNKNOWN")) {
 						newInst[0] = Utils.missingValue();
 					} else {
 						newInst[0] = (double) data.attribute(0).addStringValue(clase);
 					}
-					File txt = new File(directoryPathExt + File.separator + filesExt[i]);
-					InputStreamReader is = new InputStreamReader(new FileInputStream(txt));
-					StringBuffer txtStr = new StringBuffer();
-					int c;
-					while ((c = is.read()) != -1) {
-						txtStr.append((char) c);
-					}
-					newInst[1] = (double) data.attribute(1).addStringValue(txtStr.toString());
+					newInst[1] = (double) data.attribute(1).addStringValue(texto);
 					data.add(new DenseInstance(1.0, newInst));
-				} catch (Exception e) {
+
+				} else {
 
 				}
 			}
-			if (missing) {
-				break;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		escribirEnARRF(data, pathDirectorio[1]);
@@ -102,5 +106,6 @@ public class TextDirectoryToArff {
 				e2.printStackTrace();
 			}
 		}
+
 	}
 }

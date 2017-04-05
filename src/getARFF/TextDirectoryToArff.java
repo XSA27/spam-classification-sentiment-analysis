@@ -1,11 +1,9 @@
-package conversor;
+package getARFF;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +13,7 @@ import weka.core.DenseInstance;
 import weka.core.Instances;
 import weka.core.Utils;
 
-public class CsvAArff {
-
+public class TextDirectoryToArff {
 	public void createDataset(String[] pathDirectorio) throws Exception {
 
 		// ArrayList se utiliza para preparar los atributos
@@ -29,51 +26,50 @@ public class CsvAArff {
 
 		File dir = new File(pathDirectorio[0]);
 
-		BufferedReader br = null;
-		String line = "";
-		String cvsSplitBy = ",";
-		String clase = "?";
-		try {
+		String directoryPathExt;
+		String clase;
+		String[] filesExt;
+		boolean missing = false;
 
-			br = new BufferedReader(new FileReader(dir));
-			line = br.readLine();// necesito saltar la primera linea
-			while ((line = br.readLine()) != null) {
-				String texto = "";
-				if (line.contains("Oct")) {
+		// Se listan las carpetas
+		String[] files = dir.list();
+
+		for (int q = 0; q < files.length; q++) {
+			System.out.println();
+			clase = files[q];
+			if (!files[q].endsWith(".txt")) {
+				File dir1 = new File(pathDirectorio[0] + "\\" + files[q]);
+				directoryPathExt = pathDirectorio[0] + "\\" + files[q];
+				filesExt = dir1.list();
+			} else {
+
+				directoryPathExt = pathDirectorio[0];
+				filesExt = dir.list();
+				missing = true;
+			}
+			for (int i = 0; i < filesExt.length; i++) {
+				try {
 					double[] newInst = new double[2];
-					String[] frase = line.split(cvsSplitBy);
-					clase = frase[1];
-					for (int z = 0; z < frase.length; z++) {
-						if (z == 1) {
-							z++;
-						} else {
-							texto = texto.concat(frase[z]);
-						}
-					}
-					clase = clase.replaceAll("\"", "");
-					if (clase.equals("UNKNOWN")) {
+					if (missing) {
 						newInst[0] = Utils.missingValue();
 					} else {
 						newInst[0] = (double) data.attribute(0).addStringValue(clase);
 					}
-					newInst[1] = (double) data.attribute(1).addStringValue(texto);
+					File txt = new File(directoryPathExt + File.separator + filesExt[i]);
+					InputStreamReader is = new InputStreamReader(new FileInputStream(txt));
+					StringBuffer txtStr = new StringBuffer();
+					int c;
+					while ((c = is.read()) != -1) {
+						txtStr.append((char) c);
+					}
+					newInst[1] = (double) data.attribute(1).addStringValue(txtStr.toString());
 					data.add(new DenseInstance(1.0, newInst));
-
-				} else {
+				} catch (Exception e) {
 
 				}
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			if (missing) {
+				break;
 			}
 		}
 		escribirEnARRF(data, pathDirectorio[1]);
@@ -87,11 +83,12 @@ public class CsvAArff {
 			fichero = new FileWriter(nombre);
 			pw = new PrintWriter(fichero);
 			pw.println("@relation test");
-			pw.println("@attribute 'Class' {'ham','spam'}");
+			pw.println("@attribute 'Class' {'pos','neg'}");
 			pw.println("@attribute Mensaje string");
 			pw.println("@data");
 			while (z < data.numInstances()) {
 				pw.print(data.instance(z));
+				System.out.println(data.instance(z));
 				pw.println();
 				z++;
 			}
@@ -106,6 +103,5 @@ public class CsvAArff {
 				e2.printStackTrace();
 			}
 		}
-
 	}
 }

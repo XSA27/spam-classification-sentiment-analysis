@@ -1,4 +1,4 @@
-package header;
+package arff2bow;
 
 import java.io.File;
 import java.io.IOException;

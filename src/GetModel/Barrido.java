@@ -1,11 +1,13 @@
-package modelo;
+package GetModel;
 
 import java.util.Random;
 
 import arff2bow.Escritura;
 import arff2bow.Lectura;
 import weka.classifiers.Evaluation;
+import weka.classifiers.functions.SMO;
 import weka.classifiers.trees.RandomForest;
+import weka.core.AttributeStats;
 import weka.core.Instances;
 
 public class Barrido {
@@ -51,13 +53,13 @@ public class Barrido {
 		while (tiempoTardado < 5000) { // La evaluacion tarda menos de 5 segundos
 			while (depth < Integer.MAX_VALUE) {	// Aumentamos profundidad hasta que tarde mas de 5s
 				while (trees < train.numInstances() / 2) {
-					while (features <= 100) {
+					while (features <= 400) {
 						// Barajamos los datos
 						train.randomize(rdn);
 						dev.randomize(rdn);
 						
 						// Preparamos el clasificador
-						evaluator = new Evaluation(train); //TODO train + dev??
+						evaluator = new Evaluation(train);
 						forest = new RandomForest();
 						forest.setNumTrees(trees);
 						forest.setMaxDepth(depth);
@@ -82,7 +84,7 @@ public class Barrido {
 							bestDepth = depth;
 							bestFeatures = features;
 						}
-						features++;
+						features = features + 100;
 					}
 					trees = trees + plus;
 				}	

@@ -14,5 +14,4 @@ public class Escribir {
 		saver.setFile(new File(args));
 		saver.writeBatch();
 	}
-	
 }

@@ -1,4 +1,4 @@
-package merge;
+package GetModel;
 
 import arff2bow.Escribir;
 import arff2bow.Lectura;

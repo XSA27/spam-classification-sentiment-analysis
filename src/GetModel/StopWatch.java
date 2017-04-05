@@ -1,4 +1,4 @@
-package modelo;
+package GetModel;
 
 public class StopWatch { 
     private final long start;

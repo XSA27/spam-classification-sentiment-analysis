@@ -1,4 +1,4 @@
-package conversor;
+package getARFF;
 
 import java.io.File;
 import java.io.FileWriter;
