@@ -11,7 +11,7 @@ public class Guardar {
 	public void guardar(String args, Instances inst) throws IOException {
 		ArffSaver saver = new ArffSaver();
 		saver.setInstances(inst);
-		saver.setFile(new File(args + ".arff"));
+		saver.setFile(new File(args));
 		saver.writeBatch();
 	}
 }

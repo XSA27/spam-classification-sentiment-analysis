@@ -8,6 +8,7 @@ import weka.classifiers.Evaluation;
 import weka.classifiers.functions.SMO;
 import weka.classifiers.trees.RandomForest;
 import weka.core.AttributeStats;
+import weka.core.Instance;
 import weka.core.Instances;
 
 public class Barrido {
@@ -29,6 +30,11 @@ public class Barrido {
 
 	// TODO de la clase minoritaria ?????
 	private static void barrer() throws Exception {
+		Instances trainDev = train;
+		for (Instance i : dev) {
+			trainDev.add(i);
+		}
+		
 		Random rdn = new Random();
 		StopWatch sw, swb;
 		Evaluation evaluator;
@@ -38,7 +44,7 @@ public class Barrido {
 		int plus = train.numInstances() / 100; // Para avanzar en el while de arboles
 		long buildTime = 0;
 		long tiempoTardado = 0; // Tiempo tardado en evaluar
-		double fMeasure = 0; // F-Measure va de 0 a 1 (1 = perfecto)
+		double fMeasure = 0; // F-Measure va de 0 a 1
 		int trees = 1; // Numero de arboles actual
 		int depth = 1; // Profundidad de los arboles actual
 		int features = 1; // Numero de features actual
@@ -52,14 +58,19 @@ public class Barrido {
 		System.out.println("Finding best parameters for this problem...");
 		while (tiempoTardado < 5000) { // La evaluacion tarda menos de 5 segundos
 			while (depth < Integer.MAX_VALUE) {	// Aumentamos profundidad hasta que tarde mas de 5s
+				trees = 0;
 				while (trees < train.numInstances() / 2) {
+					features = 0;
 					while (features <= 400) {
+						System.out.println("Depth: " + depth);
+						System.out.println("Trees: " + trees);
+						System.out.println("Features: " + features);
 						// Barajamos los datos
 						train.randomize(rdn);
 						dev.randomize(rdn);
 						
 						// Preparamos el clasificador
-						evaluator = new Evaluation(train);
+						evaluator = new Evaluation(trainDev);
 						forest = new RandomForest();
 						forest.setNumTrees(trees);
 						forest.setMaxDepth(depth);
@@ -77,7 +88,10 @@ public class Barrido {
 						tiempoTardado = sw.elapsedTime();
 						System.out.println("Tiempo tardado en evaluar: " + tiempoTardado);
 						
-						fMeasure = evaluator.fMeasure(train.classIndex());
+						fMeasure = evaluator.fMeasure(0);
+						System.out.println("F-Measure: " + fMeasure);
+						System.out.println("");
+						System.out.println("");
 						if (fMeasure > bestfMeasure) {
 							bestfMeasure = fMeasure;
 							bestTrees = trees;
