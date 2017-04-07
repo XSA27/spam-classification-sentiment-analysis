@@ -1,17 +1,20 @@
 package fssInfoGain;
 
+import java.io.FileReader;
+
 import weka.core.Instances;
 
 public class FssInfoGain {
 
 	public static void main(String[] args) throws Exception {
 		FiltroAtributos info = new FiltroAtributos();
-		Lectura lec = new Lectura();
 		Guardar guardar = new Guardar();
 		Instances data, newData;
 		
 		// Leer datos de entrada
-		data = lec.leerFichero(args[0]);
+		FileReader fi = new FileReader(args[0]);
+		data = new Instances(fi);
+		fi.close();
 		
 		// Aplicar ganancia
 		newData = info.filtrar(data);

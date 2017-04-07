@@ -9,6 +9,7 @@ import weka.filters.supervised.attribute.AttributeSelection;
 public class FiltroAtributos {
 
 	public Instances filtrar(Instances data) throws Exception {
+
 		// Set filter parameters
 		AttributeSelection filter = new AttributeSelection();
 		InfoGainAttributeEval eval = new InfoGainAttributeEval();
