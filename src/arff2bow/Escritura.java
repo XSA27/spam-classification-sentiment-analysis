@@ -12,5 +12,6 @@ public class Escritura {
 		f.createNewFile();
 		BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 		bw.write(datos);
+		bw.close();
 	}
 }
