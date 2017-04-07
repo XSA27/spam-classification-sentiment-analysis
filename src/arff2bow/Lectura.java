@@ -32,13 +32,7 @@ public class Lectura {
 		}
 
 		// Encuentra la clase 'Class'
-		int pos = 0;
-		for (int t = 0; t < data.numAttributes(); t++) {
-			if (data.attribute(t).name().equalsIgnoreCase("Class")) {
-				pos = t;
-			}
-		}
-		data.setClassIndex(pos);
+		data.setClassIndex(0);
 		return data;
 	}
 }

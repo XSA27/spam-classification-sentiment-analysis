@@ -87,7 +87,7 @@ public class CsvAArff {
 			fichero = new FileWriter(nombre);
 			pw = new PrintWriter(fichero);
 			pw.println("@relation test");
-			pw.println("@attribute 'Class' {'ham','spam'}");
+			pw.println("@attribute 'Class' {'positive','negative','neutral','irrelevant'}");
 			pw.println("@attribute Mensaje string");
 			pw.println("@data");
 			while (z < data.numInstances()) {
