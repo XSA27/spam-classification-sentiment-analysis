@@ -7,7 +7,7 @@ import weka.core.Instances;
 
 public class Hold_Out {
 	
-	public Evaluation evalNaiveHoldOut(NaiveBayes naivebayes,Instances dataSet,String path) throws Exception {
+	public Evaluation evalNaiveHoldOut(NaiveBayes naivebayes,Instances dataSet) throws Exception {
 		
 		//creamos la particion para el holdout
 		int trainSize = (int) Math.round(dataSet.numInstances() * 0.7);

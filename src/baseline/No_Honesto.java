@@ -6,7 +6,7 @@ import weka.core.Instances;
 
 public class No_Honesto {
 
-	public Evaluation evalNaiveNoHon(NaiveBayes naivebayes, Instances dataSet,String path) throws Exception {
+	public Evaluation evalNaiveNoHon(NaiveBayes naivebayes, Instances dataSet) throws Exception {
 		// sistema no honesto
 		Evaluation evaluadorNoHon = new Evaluation(dataSet);
 		naivebayes.buildClassifier(dataSet);

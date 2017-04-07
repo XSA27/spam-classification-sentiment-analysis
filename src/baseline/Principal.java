@@ -22,9 +22,9 @@ public class Principal {
 		// creamos el clasificador para baseline, hemos cogido el naivebayes
 		NaiveBayes naivebayes = new NaiveBayes();
 
-		Evaluation holdOutEv = holdOut.evalNaiveHoldOut(naivebayes, dataSet, path);
-		Evaluation noHonEv = noHon.evalNaiveNoHon(naivebayes, dataSet, path);
-		Evaluation kFoldEv = kFold.evalNaiveKFold(naivebayes, dataSet, path);
+		Evaluation holdOutEv = holdOut.evalNaiveHoldOut(naivebayes, dataSet);
+		Evaluation noHonEv = noHon.evalNaiveNoHon(naivebayes, dataSet);
+		Evaluation kFoldEv = kFold.evalNaiveKFold(naivebayes, dataSet);
 		
 		resultados.imprimirResultados(holdOutEv,noHonEv,kFoldEv,path);
 	}
