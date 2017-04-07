@@ -88,7 +88,6 @@ public class TextDirectoryToArff {
 			pw.println("@data");
 			while (z < data.numInstances()) {
 				pw.print(data.instance(z));
-				System.out.println(data.instance(z));
 				pw.println();
 				z++;
 			}

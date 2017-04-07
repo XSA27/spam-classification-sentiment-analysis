@@ -1,11 +1,14 @@
 package baseline;
 
+import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Instances;
 
 public class Principal {
 
 	public static void main(String[] args) throws Exception {
+		String path = args[1];
+		Results resultados = new Results();
 		Lectura lect = new Lectura();
 
 		Hold_Out holdOut = new Hold_Out();
@@ -15,12 +18,14 @@ public class Principal {
 		Instances dataSet;
 		dataSet = lect.cargarDatos(args[0]);
 
-		System.out.println("Creamos el naiveBayes para el baseline");
+		System.out.println("Utilizando el naiveBayes para el baseline...");
 		// creamos el clasificador para baseline, hemos cogido el naivebayes
 		NaiveBayes naivebayes = new NaiveBayes();
 
-		holdOut.evalNaiveHoldOut(naivebayes, dataSet);
-		noHon.evalNaiveNoHon(naivebayes, dataSet);
-		kFold.evalNaiveKFold(naivebayes, dataSet);
+		Evaluation holdOutEv = holdOut.evalNaiveHoldOut(naivebayes, dataSet, path);
+		Evaluation noHonEv = noHon.evalNaiveNoHon(naivebayes, dataSet, path);
+		Evaluation kFoldEv = kFold.evalNaiveKFold(naivebayes, dataSet, path);
+		
+		resultados.imprimirResultados(holdOutEv,noHonEv,kFoldEv,path);
 	}
 }
