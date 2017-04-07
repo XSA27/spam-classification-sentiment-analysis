@@ -7,6 +7,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import GetModel.Hold_Out;
+import GetModel.K_Fold;
+import GetModel.No_Honesto;
+import baseline.Results;
+import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
@@ -14,10 +20,11 @@ import weka.core.SerializationHelper;
 public class GenerateModel {
 
 	public static void main(String[] args) throws Exception {
+		String estimation = args[3];
 		File f = new File(args[0]);
 		FileReader fr = new FileReader(f);
 		Instances data = new Instances(fr);
-		String exportPath = args[1] + ".model";
+		String exportPath = args[2] + ".model";
 		ArrayList<Integer> listaParametros = getParameters(args[1]);
 
 		// create model
@@ -27,8 +34,17 @@ public class GenerateModel {
 
 		// data = train + dev
 		rf.buildClassifier(data);
-
 		SerializationHelper.write(exportPath, rf);
+		
+		Results resultados = new Results();
+		Hold_Out holdOut = new Hold_Out();
+		No_Honesto noHon = new No_Honesto();
+		K_Fold kFold = new K_Fold();
+		Evaluation holdOutEv = holdOut.evalHoldOut(rf, data);
+		Evaluation noHonEv = noHon.evalNoHon(rf, data);
+		Evaluation kFoldEv = kFold.evalKFold(rf, data);
+		
+		resultados.imprimirResultados(holdOutEv,noHonEv,kFoldEv,estimation);
 	}
 
 	public static ArrayList<Integer> getParameters(String path) throws IOException {
