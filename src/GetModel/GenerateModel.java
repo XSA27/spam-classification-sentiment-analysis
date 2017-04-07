@@ -46,7 +46,7 @@ public class GenerateModel {
             linea = stringBuilder.toString();
             reader.close();
             // Separacion por comas
-            String lineaArray[] = linea.split(",");
+            String lineaArray[] = linea.split(";");
             // getParameters
             for(String param : lineaArray){
                 lista.add(Integer.parseInt(param));

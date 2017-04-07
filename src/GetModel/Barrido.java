@@ -1,13 +1,9 @@
 package GetModel;
 
-import java.util.Random;
-
 import arff2bow.Escritura;
 import arff2bow.Lectura;
 import weka.classifiers.Evaluation;
-import weka.classifiers.functions.SMO;
 import weka.classifiers.trees.RandomForest;
-import weka.core.AttributeStats;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -28,90 +24,78 @@ public class Barrido {
 		barrer();
 	}
 
-	// TODO de la clase minoritaria ?????
 	private static void barrer() throws Exception {
-		Instances trainDev = train;
-		for (Instance i : dev) {
-			trainDev.add(i);
+		// Calcular la clase minoritaria
+		int contOne = 0;
+		for (Instance i : train) {
+			if (i.classValue() == 1.0) contOne++;
 		}
-		
-		Random rdn = new Random();
-		StopWatch sw, swb;
+		int minClass = (contOne > train.numInstances() / 2) ? 0 : 1;
+
+		StopWatch sw, swb, st;
 		Evaluation evaluator;
 		RandomForest forest;
-		
+
 		// Variables para el calculo
-		int plus = train.numInstances() / 100; // Para avanzar en el while de arboles
-		long buildTime = 0;
+		int plusTree = train.numInstances() / 1000; // Para avanzar en el while de arboles
+		int plusDepth = train.numAttributes() / 100;
+		long buildTime = 0; // Tiempo tardado en buildear
 		long tiempoTardado = 0; // Tiempo tardado en evaluar
 		double fMeasure = 0; // F-Measure va de 0 a 1
-		int trees = 1; // Numero de arboles actual
-		int depth = 1; // Profundidad de los arboles actual
-		int features = 1; // Numero de features actual
-		
+		int trees = train.numInstances() / 1000; // Numero de arboles actual
+		int depth = train.numAttributes() / 100; // Profundidad de los arboles actual
+
 		// Mejores parametros encontrados hasta el momento
-		int bestTrees = 1;
-		int bestDepth = 1;
-		int bestFeatures = 1;
+		int bestTrees = train.numInstances() / 1000;
+		int bestDepth = train.numAttributes() / 100;
 		double bestfMeasure = 0;
-		
-		System.out.println("Finding best parameters for this problem...");
-		while (tiempoTardado < 5000) { // La evaluacion tarda menos de 5 segundos
-			while (depth < Integer.MAX_VALUE) {	// Aumentamos profundidad hasta que tarde mas de 5s
-				trees = 0;
-				while (trees < train.numInstances() / 2) {
-					features = 0;
-					while (features <= 400) {
-						System.out.println("Depth: " + depth);
-						System.out.println("Trees: " + trees);
-						System.out.println("Features: " + features);
-						// Barajamos los datos
-						train.randomize(rdn);
-						dev.randomize(rdn);
-						
-						// Preparamos el clasificador
-						evaluator = new Evaluation(trainDev);
-						forest = new RandomForest();
-						forest.setNumTrees(trees);
-						forest.setMaxDepth(depth);
-						forest.setNumFeatures(features);
-						
-						System.out.println("Empezamos a buildear el clasificador...");
-						swb = new StopWatch();
-						forest.buildClassifier(train);
-						buildTime = swb.elapsedTime();
-						System.out.println("Tiempo tardado en buildear: " + buildTime);
-						
-						System.out.println("Empezamos a evaluar...");
-						sw = new StopWatch();
-						evaluator.evaluateModel(forest, dev);
-						tiempoTardado = sw.elapsedTime();
-						System.out.println("Tiempo tardado en evaluar: " + tiempoTardado);
-						
-						fMeasure = evaluator.fMeasure(0);
-						System.out.println("F-Measure: " + fMeasure);
-						System.out.println("");
-						System.out.println("");
-						if (fMeasure > bestfMeasure) {
-							bestfMeasure = fMeasure;
-							bestTrees = trees;
-							bestDepth = depth;
-							bestFeatures = features;
-						}
-						features = features + 100;
-					}
-					trees = trees + plus;
-				}	
-				depth = depth + plus;
+
+		System.out.println("Buscando los mejores parametros para el problema...");
+		st = new StopWatch();
+		while (depth < train.numAttributes() / 10) {
+			trees = train.numInstances() / 1000;
+			while (trees < train.numInstances() / 100) {
+				System.out.println("Depth: " + depth);
+				System.out.println("Trees: " + trees);
+
+				evaluator = new Evaluation(train);
+				forest = new RandomForest();
+				forest.setNumTrees(trees);
+				forest.setMaxDepth(depth);
+
+				System.out.println("Empezamos a buildear el clasificador...");
+				swb = new StopWatch();
+				forest.buildClassifier(train);
+				buildTime = swb.elapsedTime();
+				System.out.println("Tiempo tardado en buildear: " + buildTime + "ms");
+
+				System.out.println("Empezamos a evaluar...");
+				sw = new StopWatch();
+				evaluator.evaluateModel(forest, dev);
+				tiempoTardado = sw.elapsedTime();
+				System.out.println("Tiempo tardado en evaluar: " + tiempoTardado + "ms");
+
+				fMeasure = evaluator.fMeasure(minClass);
+				System.out.println("F-Measure: " + fMeasure);
+				System.out.println("");
+				System.out.println("");
+				if (fMeasure > bestfMeasure) {
+					bestfMeasure = fMeasure;
+					bestTrees = trees;
+					bestDepth = depth;
+				}
+				trees = trees + plusTree;
 			}
+			depth = depth + plusDepth;
 		}
-		String params = bestTrees + ";" + bestDepth + ";" + bestFeatures;
+		String params = bestTrees + ";" + bestDepth;
 		Escritura e = new Escritura();
 		e.escribir(params, exportPath);
 
 		System.out.println("Done.");
 		System.out.println("Best numTrees: " + bestTrees);
-		System.out.println("Best numTrees: " + bestDepth);
-		System.out.println("Best numTrees: " + bestFeatures);
+		System.out.println("Best numDepth: " + bestDepth);
+		System.out.println("Best fMeasure: " + bestfMeasure);
+		System.out.println("Tiempo total tardado: " + st.elapsedTime() + "ms");
 	}
 }
