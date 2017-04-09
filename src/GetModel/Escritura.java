@@ -1,4 +1,4 @@
-package arff2bow;
+package GetModel;
 
 import java.io.BufferedWriter;
 import java.io.File;

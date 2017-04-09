@@ -9,7 +9,7 @@ import weka.core.Instances;
 public class K_Fold {
 
 	public Evaluation evalNaiveKFold(NaiveBayes naivebayes, Instances dataSet) throws Exception {
-		// kfold cross validation.
+		// kFold cross validation.
 		Evaluation evaluadorKFold = new Evaluation(dataSet);
 		evaluadorKFold.crossValidateModel(naivebayes, dataSet, 10, new Random(1));
 

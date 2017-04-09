@@ -2,7 +2,6 @@ package getARFF;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,7 @@ import weka.core.Utils;
 
 public class TextoAArff {
 
-	public void createDataset(String[] pathDirectorio) throws IOException {
+	public void createDataset(String[] pathDirectorio) {
 
 		// ArrayList se utiliza para preparar los atributos
 		ArrayList<Attribute> atributos = new ArrayList<Attribute>(2);
@@ -53,14 +52,38 @@ public class TextoAArff {
 				data.add(new DenseInstance(1.0, info));
 			}
 		} catch (Exception e) {
-			System.out.println("Error " + e);
+			System.out.println("");
 		}
 		escribirEnARRF(data, pathDirectorio[1]);
 	}
 
-	private void escribirEnARRF(Instances data, String nombre) throws IOException {
-		FileWriter fichero = new FileWriter(nombre);
-		fichero.write(data.toString());
-		fichero.close();
+	private void escribirEnARRF(Instances data, String nombre) {
+		FileWriter fichero = null;
+		PrintWriter pw = null;
+		try {
+			int z = 0;
+			fichero = new FileWriter(nombre);
+			pw = new PrintWriter(fichero);
+			pw.println("@relation test");
+			pw.println("@attribute 'Class' {'ham','spam'}");
+			pw.println("@attribute Mensaje string");
+			pw.println("@data");
+			while (z < data.numInstances()) {
+				pw.print(data.instance(z));
+				pw.println();
+				z++;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (null != fichero)
+					System.out.println("Archivo " + nombre + " creado");
+				fichero.close();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+
 	}
 }

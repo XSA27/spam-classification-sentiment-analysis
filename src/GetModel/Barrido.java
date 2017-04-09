@@ -1,7 +1,5 @@
 package GetModel;
 
-import arff2bow.Escritura;
-import arff2bow.Lectura;
 import weka.classifiers.Evaluation;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instance;
@@ -13,14 +11,16 @@ public class Barrido {
 	private static String exportPath;
 
 	public static void main(String[] args) throws Exception {
-		// args[0] = /path/train.arff
-		// args[1] = /path/dev.arff
-		// args[2] = /path/params.txt
+		System.out.println("Ruta del Train: " + args[0]);
+		System.out.println("Ruta del Dev: " + args[1]);
+		System.out.println("Ruta de salida de parametros: " + args[2]);
+		
 		Lectura l = new Lectura();
-		train = l.cargarDatos(args[0]);
+		train = l.leerFichero(args[0]);
 		l = new Lectura();
-		dev = l.cargarDatos(args[1]);
+		dev = l.leerFichero(args[1]);
 		exportPath = args[2];
+		
 		barrer();
 	}
 
@@ -28,7 +28,8 @@ public class Barrido {
 		// Calcular la clase minoritaria
 		int contOne = 0;
 		for (Instance i : train) {
-			if (i.classValue() == 1.0) contOne++;
+			if (i.classValue() == 1.0)
+				contOne++;
 		}
 		int minClass = (contOne > train.numInstances() / 2) ? 0 : 1;
 
@@ -37,26 +38,27 @@ public class Barrido {
 		RandomForest forest;
 
 		// Variables para el calculo
-		int plusTree = train.numInstances() / 1000; // Para avanzar en el while de arboles
+		int plusTree = train.numInstances() / 1000; // Para avanzar en el while
+													// de arboles
 		int plusDepth = train.numAttributes() / 100;
 		long buildTime = 0; // Tiempo tardado en buildear
 		long tiempoTardado = 0; // Tiempo tardado en evaluar
 		double fMeasure = 0; // F-Measure va de 0 a 1
 		int trees = train.numInstances() / 1000; // Numero de arboles actual
-		int depth = train.numAttributes() / 100; // Profundidad de los arboles actual
+		int depth = train.numAttributes() / 100; // Profundidad de los arboles
+													// actual
 
 		// Mejores parametros encontrados hasta el momento
 		int bestTrees = train.numInstances() / 1000;
 		int bestDepth = train.numAttributes() / 100;
 		double bestfMeasure = 0;
 
-		System.out.println("Buscando los mejores parametros para el problema...");
+		System.out.println("\nBuscando los mejores parametros para el problema...\n");
 		st = new StopWatch();
 		while (depth < train.numAttributes() / 10) {
 			trees = train.numInstances() / 1000;
 			while (trees < train.numInstances() / 100) {
-				System.out.println("Depth: " + depth);
-				System.out.println("Trees: " + trees);
+				System.out.println("Parametros actuales: numTrees " + trees + " & maxDepth " + depth + "");
 
 				evaluator = new Evaluation(train);
 				forest = new RandomForest();
@@ -76,9 +78,8 @@ public class Barrido {
 				System.out.println("Tiempo tardado en evaluar: " + tiempoTardado + "ms");
 
 				fMeasure = evaluator.fMeasure(minClass);
-				System.out.println("F-Measure: " + fMeasure);
-				System.out.println("");
-				System.out.println("");
+				System.out.println("F-Measure: " + fMeasure + "\n\n");
+
 				if (fMeasure > bestfMeasure) {
 					bestfMeasure = fMeasure;
 					bestTrees = trees;

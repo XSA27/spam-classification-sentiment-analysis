@@ -8,7 +8,7 @@ public class No_Honesto {
 
 	public Evaluation evalNoHon(RandomForest rf, Instances dataSet) throws Exception {
 		RandomForest forest = rf;
-		// sistema no honesto
+		// Sistema no honesto
 		Evaluation evaluadorNoHon = new Evaluation(dataSet);
 		forest.buildClassifier(dataSet);
 		evaluadorNoHon.evaluateModel(forest, dataSet);

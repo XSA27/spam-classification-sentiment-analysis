@@ -15,7 +15,7 @@ public class Lectura {
 		} catch (FileNotFoundException e) {
 			System.out.println("ERROR: Revisar path del fichero de datos:");
 		}
-		
+
 		// Load the instances
 		Instances data = null;
 		try {
@@ -23,7 +23,7 @@ public class Lectura {
 		} catch (IOException e) {
 			System.out.println("ERROR: Revisar contenido del fichero de datos: ");
 		}
-		
+
 		// Close the file
 		try {
 			fi.close();
@@ -31,7 +31,7 @@ public class Lectura {
 			System.out.println("*PANIC*");
 		}
 
-		// Encuentra la clase 'Class'
+		// Setea la clase
 		data.setClassIndex(0);
 		return data;
 	}
